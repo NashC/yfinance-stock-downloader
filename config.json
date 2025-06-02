@@ -1,0 +1,40 @@
+{
+  "start_date": "2000-01-01",
+  "end_date": null,
+  "processing_mode": "all",
+  "specific_sources": [],
+  "chunk_size": 25,
+  "sleep_between_chunks": 5,
+  "individual_sleep": 2,
+  "max_retries": 3,
+  "initial_backoff": 2,
+  "min_data_points": 10,
+  "log_file": "stock_download.log",
+  "data_sources": {
+    "sp500": {
+      "file": "data/sp500_tickers.csv",
+      "ticker_column": "Symbol",
+      "description": "S&P 500 Companies",
+      "output_dir": "output/sp500_data",
+      "enabled": true
+    },
+    "nasdaq100": {
+      "file": "data/nasdaq100.csv",
+      "ticker_column": "Ticker",
+      "description": "NASDAQ 100 Companies",
+      "output_dir": "output/nasdaq100_data",
+      "enabled": true,
+      "filter_column": "Market Cap",
+      "filter_values": [
+        "Large Cap"
+      ]
+    },
+    "etfs": {
+      "file": "data/etf_list.csv",
+      "ticker_column": "Symbol",
+      "description": "ETF Universe",
+      "output_dir": "output/etf_data",
+      "enabled": true
+    }
+  }
+}

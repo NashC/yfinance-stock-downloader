@@ -1,0 +1,173 @@
+2025-06-01 20:57:37 | INFO     | ================================================================================
+2025-06-01 20:57:37 | INFO     | Enhanced Multi-Source Stock Price Data Downloader Started
+2025-06-01 20:57:37 | INFO     | Processing Mode: all
+2025-06-01 20:57:37 | INFO     | Configuration: START_DATE=2000-01-01, END_DATE=None
+2025-06-01 20:57:37 | INFO     | Chunk size: 25, Sleep: 5s
+2025-06-01 20:57:37 | INFO     | ================================================================================
+2025-06-01 20:57:37 | INFO     | All mode: Processing all enabled sources: ['etf_list', 'iwb_holdings_250529']
+2025-06-01 20:57:37 | INFO     | Will process 2 data source(s): ['etf_list', 'iwb_holdings_250529']
+2025-06-01 20:57:37 | INFO     | ================================================================================
+2025-06-01 20:57:37 | INFO     | PROCESSING: Auto-discovered: etf_list.csv
+2025-06-01 20:57:37 | INFO     | ================================================================================
+2025-06-01 20:57:37 | INFO     | Loaded Auto-discovered: etf_list.csv: 250 rows, columns: ['Symbol', 'ETF Name', 'Asset Class', 'Total Assets ($MM)', 'YTD Price Change', 'Avg. Daily Share Volume (3mo)', 'Previous Closing Price']
+2025-06-01 20:57:37 | INFO     | Found 250 raw ticker entries in Auto-discovered: etf_list.csv
+2025-06-01 20:57:37 | INFO     | Auto-discovered: etf_list.csv: 250 valid, 0 invalid tickers
+2025-06-01 20:57:37 | INFO     | Output directory: /Users/nash/Documents/coding_projects/yfinance_stock_downloader/test_output/etf_list_data
+2025-06-01 20:57:37 | INFO     | Total tickers: 250
+2025-06-01 20:57:37 | INFO     | Already downloaded: 0
+2025-06-01 20:57:37 | INFO     | Remaining to download: 250
+2025-06-01 20:57:37 | INFO     | Processing 10 chunks...
+2025-06-01 20:57:37 | INFO     | === Chunk 1/10: 25 tickers ===
+2025-06-01 20:57:37 | INFO     | → Downloading chunk of 25 tickers (attempt 1)
+2025-06-01 20:57:38 | WARNING  | No data found for VOO in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for SPY in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IVV in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VTI in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for QQQ in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VUG in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VEA in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IEFA in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VTV in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for BND in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for AGG in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IWF in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for GLD in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IJH in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VXUS in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VIG in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IEMG in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VGT in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VWO in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for VO in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IJR in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for XLK in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for IBIT in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for RSP in chunk response
+2025-06-01 20:57:38 | WARNING  | No data found for SCHD in chunk response
+2025-06-01 20:57:38 | INFO     | ✓ Chunk completed: 0 successful, 25 failed
+2025-06-01 20:57:38 | INFO     | Sleeping 5s before next chunk...
+2025-06-01 20:57:43 | INFO     | === Chunk 2/10: 25 tickers ===
+2025-06-01 20:57:43 | INFO     | → Downloading chunk of 25 tickers (attempt 1)
+2025-06-01 20:57:45 | WARNING  | No data found for SPLG in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for ITOT in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for BNDX in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IWM in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for EFA in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for VB in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IWD in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for VYM in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IVW in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for SCHX in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for VCIT in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for QUAL in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for TLT in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for XLF in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for QQQM in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for SGOV in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for SCHF in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IAU in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for VT in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IXUS in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for BIL in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for VEU in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for SCHG in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IWB in chunk response
+2025-06-01 20:57:45 | WARNING  | No data found for IWR in chunk response
+2025-06-01 20:57:45 | INFO     | ✓ Chunk completed: 0 successful, 25 failed
+2025-06-01 20:57:45 | INFO     | Sleeping 5s before next chunk...
+2025-06-01 20:57:50 | INFO     | === Chunk 3/10: 25 tickers ===
+2025-06-01 20:57:50 | INFO     | → Downloading chunk of 25 tickers (attempt 1)
+2025-06-01 20:57:51 | WARNING  | No data found for VV in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for JEPI in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for MUB in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for BSV in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for MBB in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for DIA in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for IVE in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VTEB in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for IEF in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VCSH in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for SPYG in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for XLV in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VNQ in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for DFAC in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for SCHB in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for IUSB in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VGIT in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for JPST in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for DGRO in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for LQD in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VBR in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for VONG in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for GOVT in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for XLE in chunk response
+2025-06-01 20:57:51 | WARNING  | No data found for SPDW in chunk response
+2025-06-01 20:57:51 | INFO     | ✓ Chunk completed: 0 successful, 25 failed
+2025-06-01 20:57:51 | INFO     | Sleeping 5s before next chunk...
+2025-06-01 21:00:27 | INFO     | ================================================================================
+2025-06-01 21:00:27 | INFO     | Enhanced Multi-Source Stock Price Data Downloader Started
+2025-06-01 21:00:27 | INFO     | Processing Mode: specific
+2025-06-01 21:00:27 | INFO     | Configuration: START_DATE=2000-01-01, END_DATE=None
+2025-06-01 21:00:27 | INFO     | Chunk size: 2, Sleep: 1s
+2025-06-01 21:00:27 | INFO     | ================================================================================
+2025-06-01 21:00:27 | INFO     | Specific mode: Processing requested sources: ['etf_list']
+2025-06-01 21:00:27 | INFO     | Will process 1 data source(s): ['etf_list']
+2025-06-01 21:00:27 | INFO     | ================================================================================
+2025-06-01 21:00:27 | INFO     | PROCESSING: ETF Universe
+2025-06-01 21:00:27 | INFO     | ================================================================================
+2025-06-01 21:00:27 | INFO     | Loaded ETF Universe: 250 rows, columns: ['Symbol', 'ETF Name', 'Asset Class', 'Total Assets ($MM)', 'YTD Price Change', 'Avg. Daily Share Volume (3mo)', 'Previous Closing Price']
+2025-06-01 21:00:27 | INFO     | Found 250 raw ticker entries in ETF Universe
+2025-06-01 21:00:27 | INFO     | ETF Universe: 250 valid, 0 invalid tickers
+2025-06-01 21:00:27 | INFO     | Output directory: /Users/nash/Documents/coding_projects/yfinance_stock_downloader/etf_data
+2025-06-01 21:00:27 | INFO     | Total tickers: 250
+2025-06-01 21:00:27 | INFO     | Already downloaded: 0
+2025-06-01 21:00:27 | INFO     | Remaining to download: 250
+2025-06-01 21:00:27 | INFO     | Processing 125 chunks...
+2025-06-01 21:00:27 | INFO     | === Chunk 1/125: 2 tickers ===
+2025-06-01 21:00:27 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:28 | WARNING  | No data found for VOO in chunk response
+2025-06-01 21:00:28 | WARNING  | No data found for SPY in chunk response
+2025-06-01 21:00:28 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:28 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:29 | INFO     | === Chunk 2/125: 2 tickers ===
+2025-06-01 21:00:29 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:29 | WARNING  | No data found for IVV in chunk response
+2025-06-01 21:00:29 | WARNING  | No data found for VTI in chunk response
+2025-06-01 21:00:29 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:29 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:30 | INFO     | === Chunk 3/125: 2 tickers ===
+2025-06-01 21:00:30 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:31 | WARNING  | No data found for QQQ in chunk response
+2025-06-01 21:00:31 | WARNING  | No data found for VUG in chunk response
+2025-06-01 21:00:31 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:31 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:32 | INFO     | === Chunk 4/125: 2 tickers ===
+2025-06-01 21:00:32 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:32 | WARNING  | No data found for VEA in chunk response
+2025-06-01 21:00:32 | WARNING  | No data found for IEFA in chunk response
+2025-06-01 21:00:32 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:32 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:33 | INFO     | === Chunk 5/125: 2 tickers ===
+2025-06-01 21:00:33 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:33 | WARNING  | No data found for VTV in chunk response
+2025-06-01 21:00:33 | WARNING  | No data found for BND in chunk response
+2025-06-01 21:00:33 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:33 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:34 | INFO     | === Chunk 6/125: 2 tickers ===
+2025-06-01 21:00:34 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:34 | WARNING  | No data found for AGG in chunk response
+2025-06-01 21:00:34 | WARNING  | No data found for IWF in chunk response
+2025-06-01 21:00:34 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:34 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:35 | INFO     | === Chunk 7/125: 2 tickers ===
+2025-06-01 21:00:35 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:36 | WARNING  | No data found for GLD in chunk response
+2025-06-01 21:00:36 | WARNING  | No data found for IJH in chunk response
+2025-06-01 21:00:36 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:36 | INFO     | Sleeping 1s before next chunk...
+2025-06-01 21:00:37 | INFO     | === Chunk 8/125: 2 tickers ===
+2025-06-01 21:00:37 | INFO     | → Downloading chunk of 2 tickers (attempt 1)
+2025-06-01 21:00:37 | WARNING  | No data found for VXUS in chunk response
+2025-06-01 21:00:37 | WARNING  | No data found for VIG in chunk response
+2025-06-01 21:00:37 | INFO     | ✓ Chunk completed: 0 successful, 2 failed
+2025-06-01 21:00:37 | INFO     | Sleeping 1s before next chunk...

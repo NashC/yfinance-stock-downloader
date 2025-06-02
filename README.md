@@ -1,50 +1,114 @@
 # Enhanced Multi-Source Stock Price Data Downloader
 
-A production-ready Python application for downloading historical stock price data from Yahoo Finance with support for multiple data sources, robust error handling, and intelligent rate limiting.
+A production-ready Python application for downloading historical stock price data from Yahoo Finance with **complete generalization** for any CSV ticker sources. No longer limited to specific files - works with any CSV containing ticker symbols!
 
-## 🚀 Features
+## 🚀 Key Features
 
-- **Multi-source data support** - Individual stocks (Russell 1000) + ETF universe
-- **Modular architecture** - Clean separation of concerns with organized packages
-- **Intelligent rate limiting** - Respects Yahoo Finance API limits with exponential backoff
-- **Progress tracking** - Real-time progress bars and comprehensive logging
-- **Resume capability** - Automatically skips already downloaded files
-- **Data validation** - Validates ticker symbols and data quality
-- **Configurable processing** - Multiple processing modes (stocks, ETFs, both, auto)
-- **Production-ready** - Type hints, error handling, and comprehensive testing
+- **🔍 Auto-Discovery** - Automatically detects CSV files and ticker columns
+- **📄 JSON Configuration** - Flexible configuration for complex setups  
+- **🔄 Legacy Compatibility** - Backward compatible with original hardcoded sources
+- **🎯 Selective Processing** - Process specific sources or all available
+- **📊 Real-time Progress** - Progress bars and comprehensive logging
+- **🔁 Resume Capability** - Automatically skips already downloaded files
+- **✅ Data Validation** - Validates ticker symbols and data quality
+- **🏗️ Modular Architecture** - Clean separation with organized packages
+- **⚡ Intelligent Rate Limiting** - Respects Yahoo Finance API limits
+- **🧪 Comprehensive Testing** - Full test suite with multiple scenarios
 
 ## 📁 Project Structure
 
 ```
-yfinance_stock_prices/
+yfinance_stock_downloader/
 ├── src/                          # Main package
 │   ├── __init__.py              # Package exports
-│   ├── config.py                # Configuration classes and enums
+│   ├── config.py                # Generalized configuration system
 │   ├── validators.py            # Ticker and data validation
 │   └── downloader.py            # Main downloader class
 ├── tests/                       # Test suite
-│   ├── __init__.py
-│   └── test_downloader.py       # Test version with limited tickers
-├── data/                        # Input data sources
-│   ├── IWB_holdings_250529.csv # Russell 1000 stock holdings
-│   └── etf_list.csv            # ETF universe data
-├── stock_data/                  # Output: Individual stock CSV files
-├── etf_data/                    # Output: ETF CSV files
-├── main.py                      # Main entry point
+│   ├── test_downloader.py       # Comprehensive test suite
+│   ├── test_outputs/            # Test data outputs
+│   └── logs/                    # Test logs
+├── data/                        # Input CSV files (auto-discovered)
+│   ├── IWB_holdings_250529.csv # Example: Russell 1000 stocks
+│   └── etf_list.csv            # Example: ETF universe
+├── main.py                      # Main entry point with CLI
+├── config.json                  # Sample JSON configuration
 ├── pyproject.toml              # Modern Python packaging
-├── requirements.txt            # Dependencies
 └── README.md                   # This file
 ```
 
-## 🛠 Installation & Setup
+## 🎯 Multiple Usage Modes
+
+### 1. **Auto-Discovery Mode (Recommended)**
+```bash
+# Automatically discover CSV files in data/ directory
+.venv/bin/python main.py
+
+# Use custom directories
+.venv/bin/python main.py --data-dir my_data --output-dir my_output
+```
+
+**What it does:**
+- Scans for CSV files in the specified directory
+- Auto-detects ticker columns (`ticker`, `symbol`, `Ticker`, `Symbol`, etc.)
+- Creates organized output directories for each source
+- Processes all discovered sources
+
+### 2. **JSON Configuration Mode**
+```bash
+# Create sample configuration
+.venv/bin/python main.py --create-config
+
+# Use custom configuration
+.venv/bin/python main.py --config config.json
+```
+
+**Sample JSON Configuration:**
+```json
+{
+  "start_date": "2000-01-01",
+  "end_date": null,
+  "processing_mode": "all",
+  "chunk_size": 25,
+  "sleep_between_chunks": 5,
+  "data_sources": {
+    "sp500": {
+      "file": "data/sp500_tickers.csv",
+      "ticker_column": "Symbol",
+      "description": "S&P 500 Companies",
+      "output_dir": "output/sp500_data",
+      "enabled": true,
+      "filter_column": "Market Cap",
+      "filter_values": ["Large Cap"]
+    }
+  }
+}
+```
+
+### 3. **Legacy Mode (Backward Compatible)**
+```bash
+# Use original hardcoded configuration
+.venv/bin/python main.py --legacy
+```
+
+### 4. **Selective Processing**
+```bash
+# Process only specific sources
+.venv/bin/python main.py --sources etf_list,iwb_holdings
+
+# Process only ETFs with custom settings
+.venv/bin/python main.py --sources etf_list --chunk-size 10 --sleep 3
+```
+
+## 🛠️ Installation & Setup
 
 ### Modern Setup with uv (Recommended)
-
 ```bash
-# Install uv package manager
-curl -LsSf https://astral.sh/uv/install.sh | sh
+# Clone repository
+git clone https://github.com/NashC/yfinance-stock-downloader.git
+cd yfinance-stock-downloader
 
-# Create and activate virtual environment
+# Create virtual environment
 uv venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
@@ -53,160 +117,144 @@ uv pip install -e .
 ```
 
 ### Alternative Installation
-
 ```bash
-# Create virtual environment
-python3 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+# Install dependencies only
+uv pip install -r requirements.txt
 
-# Install dependencies
+# Use lock file for exact reproducibility
+uv pip sync requirements.lock
+
+# Install with development tools
+uv pip install -e ".[dev]"
+```
+
+### Legacy Setup
+```bash
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 🎯 Usage
+## 📊 Data Sources & Configuration
 
-### Command-Line Tool (Recommended)
+### **Supported CSV Formats**
+The system automatically detects CSV files with ticker symbols in columns named:
+- `ticker`, `Ticker`, `TICKER`
+- `symbol`, `Symbol`, `SYMBOL`
+- Any column specified in JSON configuration
+
+### **Example Data Sources**
+- **Individual Stocks**: Russell 1000, S&P 500, NASDAQ 100, custom stock lists
+- **ETFs**: Broad market, sector, international, bond, commodity ETFs
+- **Custom Lists**: Any CSV with ticker symbols
+
+### **Output Structure**
+```
+output/
+├── source1_data/
+│   ├── AAPL.csv
+│   ├── MSFT.csv
+│   └── ...
+├── source2_data/
+│   ├── VOO.csv
+│   ├── SPY.csv
+│   └── ...
+└── logs/
+    └── stock_download.log
+```
+
+## 🎮 Command-Line Interface
 
 ```bash
-# Run the downloader
-download-stock-data
+# Show all options
+.venv/bin/python main.py --help
+
+# Common usage patterns
+.venv/bin/python main.py                           # Auto-discover and process all
+.venv/bin/python main.py --config my_config.json   # Use JSON configuration
+.venv/bin/python main.py --legacy                  # Original behavior
+.venv/bin/python main.py --create-config           # Create sample config
+.venv/bin/python main.py --sources etfs            # Process specific sources
+.venv/bin/python main.py --start-date 2020-01-01   # Custom date range
+.venv/bin/python main.py --chunk-size 10 --sleep 2 # Performance tuning
 ```
 
-### Direct Python Execution
+## 📈 Progress Tracking
 
-```bash
-# Run main script
-python main.py
+The system provides comprehensive progress updates:
 
-# Run test version (limited tickers)
-python tests/test_downloader.py
 ```
+🔍 Auto-discovering CSV files in 'data' directory...
+✓ Auto-discovered: etf_list.csv (ticker column: Symbol)
+✓ Auto-discovered: IWB_holdings_250529.csv (ticker column: Ticker)
 
-### Programmatic Usage
+✓ Found 2 data source(s):
+  • Auto-discovered: etf_list.csv
+    File: data/etf_list.csv
+    Ticker column: Symbol
+    Output: output/etf_list_data
 
-```python
-from src import StockDataDownloader, DownloadConfig, ProcessingMode
+INFO     | Enhanced Multi-Source Stock Price Data Downloader Started
+INFO     | Processing Mode: all
+INFO     | Configuration: START_DATE=2000-01-01, END_DATE=None
 
-# Configure downloader
-config = DownloadConfig(
-    start_date="2020-01-01",
-    processing_mode=ProcessingMode.BOTH,
-    chunk_size=25,
-    sleep_between_chunks=5
-)
+Downloading ETF Universe: 45%|████▌     | 112/250 [02:15<02:45, 1.2ticker/s]
 
-# Run downloader
-downloader = StockDataDownloader(config)
-downloader.run()
-```
+INFO     | ✓ Saved VOO: 6234 data points to VOO.csv
+INFO     | ✓ Chunk completed: 25 successful, 0 failed
 
-## ⚙️ Configuration
-
-### Processing Modes
-
-- `ProcessingMode.BOTH` - Download both stocks and ETFs (default)
-- `ProcessingMode.STOCKS` - Download only individual stocks
-- `ProcessingMode.ETFS` - Download only ETFs
-- `ProcessingMode.AUTO` - Auto-detect available sources
-
-### Rate Limiting Settings
-
-```python
-config = DownloadConfig(
-    chunk_size=25,              # Tickers per batch
-    sleep_between_chunks=5,     # Seconds between batches (~12 req/min)
-    individual_sleep=2,         # Seconds between individual retries (~30 req/min)
-    max_retries=3,              # Maximum retry attempts
-    initial_backoff=2           # Exponential backoff (2→4→8 seconds)
-)
-```
-
-### Data Sources
-
-The application supports multiple CSV data sources:
-
-```python
-# Individual Stocks (Russell 1000)
-"iwb_holdings": {
-    "file": "data/IWB_holdings_250529.csv",
-    "ticker_column": "Ticker",
-    "output_dir": "stock_data"
-}
-
-# ETF Universe
-"etf_list": {
-    "file": "data/etf_list.csv", 
-    "ticker_column": "Symbol",
-    "output_dir": "etf_data"
-}
-```
-
-## 📊 Data Output
-
-Each ticker generates a CSV file with OHLCV data:
-
-```csv
-Date,Open,High,Low,Close,Adj Close,Volume
-2020-01-02,74.0600,75.1500,73.7975,75.0875,73.1234,135480400
-2020-01-03,74.2875,75.1450,74.1250,74.3575,72.4119,146322800
+COMPREHENSIVE DOWNLOAD SUMMARY
+================================================================================
+ETF Universe:
+  • Total tickers: 250
+  • Successfully downloaded: 248
+  • Failed: 2
+  • Success rate: 99.2%
+  • Output directory: output/etf_list_data
 ```
 
 ## 🧪 Testing
 
-### Quick Test (5 tickers per source)
-
+### Run Comprehensive Tests
 ```bash
-python tests/test_downloader.py
+# Run full test suite
+.venv/bin/python tests/test_downloader.py
+
+# Test specific functionality
+.venv/bin/python -c "from src.config import ConfigLoader; ConfigLoader.auto_discover_csv_files('data')"
 ```
 
-### Development Testing
+### Test Coverage
+- ✅ Auto-discovery functionality
+- ✅ JSON configuration loading
+- ✅ Legacy compatibility
+- ✅ Limited download testing
+- ✅ Error handling and retry logic
+- ✅ Progress tracking and logging
 
-```bash
-# Install development dependencies
-uv pip install -e ".[dev]"
+## 🔧 Configuration Options
 
-# Run linting and formatting
-black src/ tests/
-isort src/ tests/
-mypy src/
-ruff check src/ tests/
-```
+### **Processing Modes**
+- `all` - Process all available sources (default)
+- `specific` - Process only named sources
+- `auto` - Auto-detect and process available files
 
-## 📈 Performance & Rate Limiting
+### **Performance Tuning**
+- `chunk_size` - Number of tickers per batch (default: 25)
+- `sleep_between_chunks` - Seconds between chunks (default: 5)
+- `individual_sleep` - Seconds between individual downloads (default: 2)
+- `max_retries` - Maximum retry attempts (default: 3)
 
-The application implements conservative rate limiting to respect Yahoo Finance API limits:
+### **Data Validation**
+- `min_data_points` - Minimum data points to consider valid (default: 10)
+- Automatic ticker symbol validation
+- Data quality checks and cleaning
 
-- **Chunk downloads**: ~12 requests/minute (well below 60/min limit)
-- **Individual retries**: ~30 requests/minute (safe buffer)
-- **Total theoretical max**: ~42 requests/minute (30% buffer)
-- **Exponential backoff**: Automatic retry with increasing delays
-
-## 🔧 Architecture
-
-### Modular Design
-
-- **`src/config.py`** - Configuration classes and enums
-- **`src/validators.py`** - Ticker validation and data cleaning
-- **`src/downloader.py`** - Main download logic and orchestration
-- **`main.py`** - Entry point and CLI interface
-
-### Key Classes
-
-- **`DownloadConfig`** - Main configuration dataclass
-- **`DataSourceConfig`** - Individual data source configuration
-- **`TickerValidator`** - Ticker symbol validation and cleaning
-- **`DataValidator`** - Downloaded data validation and formatting
-- **`StockDataDownloader`** - Main orchestration class
-
-## 📝 Logging
-
-Comprehensive logging to both console and file:
-
-```
-2024-01-15 10:30:15 | INFO     | Enhanced Multi-Source Stock Price Data Downloader Started
-2024-01-15 10:30:16 | INFO     | ✓ Saved AAPL: 1,234 data points to AAPL.csv
-2024-01-15 10:30:45 | INFO     | 🎉 All downloads completed successfully!
-```
+### **Advanced Features**
+- **Filtering**: Filter CSV rows based on column values
+- **Custom Output**: Specify output directories per source
+- **Resume Capability**: Automatically skip existing files
+- **Comprehensive Logging**: Detailed logs with timestamps
 
 ## 🚨 Error Handling
 
@@ -214,22 +262,38 @@ Comprehensive logging to both console and file:
 - **Invalid tickers**: Validation and filtering with detailed logging
 - **API rate limits**: Conservative delays and intelligent chunking
 - **Data validation**: Quality checks for downloaded data
-- **Resume capability**: Skips existing files automatically
+- **File conflicts**: Resume capability skips existing files
 
 ## 📋 Requirements
 
-- Python 3.8+
-- pandas
-- yfinance
-- tqdm
+- Python 3.9+
+- pandas>=2.0.0
+- yfinance>=0.2.18
+- tqdm>=4.65.0
+
+## 🆕 Migration from Original Version
+
+### **Automatic Migration**
+The system is **100% backward compatible**:
+```bash
+# Original behavior (still works)
+.venv/bin/python main.py --legacy
+```
+
+### **Recommended Upgrade Path**
+1. **Test auto-discovery**: `.venv/bin/python main.py`
+2. **Create custom config**: `.venv/bin/python main.py --create-config`
+3. **Customize as needed**: Edit `config.json`
+4. **Use new features**: Selective processing, custom sources, etc.
 
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
 3. Make changes with proper type hints and tests
-4. Run linting: `black . && isort . && mypy src/`
-5. Submit a pull request
+4. Run tests: `.venv/bin/python tests/test_downloader.py`
+5. Run linting: `black . && isort . && mypy src/`
+6. Submit a pull request
 
 ## 📄 License
 
@@ -239,18 +303,32 @@ This project is open source and available under the MIT License.
 
 ### Common Issues
 
-1. **Import errors**: Ensure virtual environment is activated and dependencies installed
-2. **File not found**: Check that CSV files exist in `data/` directory
-3. **Rate limiting**: Increase sleep times if experiencing API errors
-4. **Permission errors**: Ensure write permissions for output directories
+1. **Virtual Environment**: Ensure you're using `.venv/bin/python` or activate the environment
+2. **Dependencies**: Install with `uv pip install -e .`
+3. **CSV Format**: Ensure CSV has recognizable ticker column names
+4. **Permissions**: Ensure write permissions for output directories
 
 ### Getting Help
 
-1. Check the log file: `multi_source_download.log`
-2. Run test version first: `python tests/test_downloader.py`
-3. Verify configuration in `src/config.py`
-4. Check data source files in `data/` directory
+1. **Check logs**: Review the detailed log files
+2. **Run tests**: `.venv/bin/python tests/test_downloader.py`
+3. **Test auto-discovery**: Verify CSV files are detected correctly
+4. **Use legacy mode**: Fall back to original behavior if needed
+
+### Debug Commands
+```bash
+# Test auto-discovery
+.venv/bin/python -c "from src.config import ConfigLoader; ConfigLoader.auto_discover_csv_files('data')"
+
+# Create sample config
+.venv/bin/python main.py --create-config
+
+# Test with minimal data
+.venv/bin/python main.py --sources etf_list --chunk-size 2
+```
 
 ---
 
-**Built with ❤️ for reliable financial data collection** 
+**🎯 Now supports ANY CSV files with ticker symbols - not just the original two sources!**
+
+Built with ❤️ for flexible, scalable financial data collection 

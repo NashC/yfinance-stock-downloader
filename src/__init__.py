@@ -10,7 +10,7 @@ __author__ = "Your Name"
 __email__ = "your.email@example.com"
 
 from .downloader import StockDataDownloader
-from .config import DownloadConfig, DataSourceConfig, ProcessingMode
+from .config import DownloadConfig, DataSourceConfig, ProcessingMode, ConfigLoader, create_legacy_config
 from .validators import TickerValidator, DataValidator
 
 __all__ = [
@@ -18,6 +18,8 @@ __all__ = [
     "DownloadConfig", 
     "DataSourceConfig",
     "ProcessingMode",
+    "ConfigLoader",
+    "create_legacy_config",
     "TickerValidator",
     "DataValidator",
 ] 

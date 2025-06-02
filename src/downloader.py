@@ -23,7 +23,11 @@ class StockDataDownloader:
     def __init__(self, config: DownloadConfig):
         self.config = config
         self.logger = self._setup_logging()
-        self.data_sources = self._initialize_data_sources()
+        self.data_sources = config.data_sources
+        
+        # Validate configuration
+        if not self.data_sources:
+            raise ValueError("No data sources configured. Use ConfigLoader to set up data sources.")
     
     def _setup_logging(self) -> logging.Logger:
         """Configure enhanced logging with both file and console output."""
@@ -53,25 +57,6 @@ class StockDataDownloader:
         
         return logger
     
-    def _initialize_data_sources(self) -> Dict[str, DataSourceConfig]:
-        """Initialize data source configurations."""
-        return {
-            "iwb_holdings": DataSourceConfig(
-                file="data/IWB_holdings_250529.csv",
-                ticker_column="Ticker",
-                description="IWB Russell 1000 Holdings (Individual Stocks)",
-                output_dir="stock_data",
-                enabled=True
-            ),
-            "etf_list": DataSourceConfig(
-                file="data/etf_list.csv",
-                ticker_column="Symbol",
-                description="ETF Universe",
-                output_dir="etf_data",
-                enabled=True
-            )
-        }
-    
     def load_tickers_from_source(self, source_config: DataSourceConfig) -> Tuple[List[str], str]:
         """Load and validate tickers from a specific data source."""
         try:
@@ -85,6 +70,15 @@ class StockDataDownloader:
             if source_config.ticker_column not in df.columns:
                 self.logger.error(f"Column '{source_config.ticker_column}' not found in {source_config.file}. Available: {list(df.columns)}")
                 return [], source_config.description
+            
+            # Apply filters if specified
+            if source_config.filter_column and source_config.filter_values:
+                if source_config.filter_column in df.columns:
+                    original_count = len(df)
+                    df = df[df[source_config.filter_column].isin(source_config.filter_values)]
+                    self.logger.info(f"Applied filter on '{source_config.filter_column}': {original_count} → {len(df)} rows")
+                else:
+                    self.logger.warning(f"Filter column '{source_config.filter_column}' not found, ignoring filter")
             
             # Extract and clean tickers
             raw_tickers = df[source_config.ticker_column].dropna().astype(str).tolist()
@@ -127,12 +121,17 @@ class StockDataDownloader:
         if mode == ProcessingMode.AUTO:
             self.logger.info(f"Auto mode: Processing all available sources: {available_sources}")
             return available_sources
-        elif mode == ProcessingMode.STOCKS:
-            return ["iwb_holdings"] if "iwb_holdings" in available_sources else []
-        elif mode == ProcessingMode.ETFS:
-            return ["etf_list"] if "etf_list" in available_sources else []
-        elif mode == ProcessingMode.BOTH:
+        elif mode == ProcessingMode.ALL:
+            self.logger.info(f"All mode: Processing all enabled sources: {available_sources}")
             return available_sources
+        elif mode == ProcessingMode.SPECIFIC:
+            # Filter to only requested sources that are available
+            requested_sources = [s for s in self.config.specific_sources if s in available_sources]
+            if not requested_sources:
+                self.logger.warning(f"None of the requested sources {self.config.specific_sources} are available")
+            else:
+                self.logger.info(f"Specific mode: Processing requested sources: {requested_sources}")
+            return requested_sources
         else:
             self.logger.error(f"Invalid processing mode: {mode}")
             return available_sources
@@ -280,7 +279,15 @@ class StockDataDownloader:
         tickers, description = self.load_tickers_from_source(source_config)
         if not tickers:
             self.logger.warning(f"No valid tickers found for {description}")
-            return {"source": source_name, "total": 0, "processed": 0, "successful": 0, "failed": 0}
+            return {
+                "source": source_name, 
+                "description": description,
+                "total": 0, 
+                "processed": 0, 
+                "successful": 0, 
+                "failed": 0,
+                "output_dir": str(Path(source_config.output_dir).absolute())
+            }
         
         # Setup output directory
         output_dir = Path(source_config.output_dir)
@@ -299,10 +306,12 @@ class StockDataDownloader:
             self.logger.info("🎉 All tickers already downloaded!")
             return {
                 "source": source_name,
+                "description": description,
                 "total": len(tickers),
                 "processed": 0,
                 "successful": len(existing_tickers),
-                "failed": 0
+                "failed": 0,
+                "output_dir": str(output_dir.absolute())
             }
         
         # Process in chunks

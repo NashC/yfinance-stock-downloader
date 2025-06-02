@@ -5,13 +5,31 @@ alwaysApply: true
 ---
 # Data Sources Guide
 
-## Available Data Sources
+## Overview
+The system now supports **any CSV files containing ticker symbols** - no longer limited to specific hardcoded sources. The original two CSV files are just examples of what the system can process.
 
-### Individual Stocks - IWB Holdings
+## Supported CSV Formats
+
+### Auto-Detection Capabilities
+The system automatically detects CSV files with ticker symbols in columns named:
+- **Common variations**: `ticker`, `Ticker`, `TICKER`
+- **Symbol variations**: `symbol`, `Symbol`, `SYMBOL`
+- **Custom columns**: Any column name specified in JSON configuration
+
+### CSV Requirements
+- **Header row** required (first row with column names)
+- **Ticker column** with valid stock/ETF symbols
+- **Any encoding** (UTF-8, ASCII, etc.)
+- **Any additional columns** (ignored during processing)
+- **Any file size** (system handles large files efficiently)
+
+## Example Data Sources
+
+### Individual Stocks
 **File**: [IWB_holdings_250529.csv](mdc:IWB_holdings_250529.csv)
 **Ticker Column**: `Ticker`
 **Count**: 1,021 Russell 1000 stocks
-**Output Directory**: `stock_data/`
+**Output Directory**: `output/iwb_holdings_250529_data/` (auto-discovery) or `stock_data/` (legacy)
 
 **Best for**:
 - Individual stock analysis and research
@@ -34,7 +52,7 @@ AAPL,APPLE INC,Information Technology,Equity,...
 **File**: [etf_list.csv](mdc:etf_list.csv)
 **Ticker Column**: `Symbol`
 **Count**: 250+ ETFs
-**Output Directory**: `etf_data/`
+**Output Directory**: `output/etf_list_data/` (auto-discovery) or `etf_data/` (legacy)
 
 **Best for**:
 - Diversified portfolio construction
@@ -59,8 +77,74 @@ SPY,SPDR S&P 500 ETF Trust,Equity,"$601,099",0.87%
 IVV,iShares Core S&P 500 ETF,Equity,"$580,170",0.90%
 ```
 
+## Adding Custom Data Sources
+
+### Method 1: Auto-Discovery (Recommended)
+Simply add your CSV file to the `data/` directory:
+
+```bash
+# Add your CSV file
+cp my_stocks.csv data/
+
+# Run auto-discovery
+.venv/bin/python main.py
+```
+
+**Requirements**:
+- CSV file in `data/` directory
+- Ticker column with recognizable name (`ticker`, `symbol`, etc.)
+- Valid ticker symbols in the column
+
+### Method 2: JSON Configuration
+Create a custom configuration for precise control:
+
+```json
+{
+  "data_sources": {
+    "sp500": {
+      "file": "data/sp500_tickers.csv",
+      "ticker_column": "Symbol",
+      "description": "S&P 500 Companies",
+      "output_dir": "output/sp500_data",
+      "enabled": true
+    },
+    "nasdaq100": {
+      "file": "data/nasdaq100.csv",
+      "ticker_column": "Ticker",
+      "description": "NASDAQ 100 Companies",
+      "output_dir": "output/nasdaq100_data",
+      "enabled": true,
+      "filter_column": "Market Cap",
+      "filter_values": ["Large Cap"]
+    },
+    "my_watchlist": {
+      "file": "data/my_watchlist.csv",
+      "ticker_column": "Stock_Symbol",
+      "description": "My Personal Watchlist",
+      "output_dir": "output/watchlist_data",
+      "enabled": true
+    }
+  }
+}
+```
+
 ## Data Processing Flow
 
+### Auto-Discovery Flow
+1. **Scan Directory**: Look for CSV files in specified directory
+2. **Detect Columns**: Identify ticker columns automatically
+3. **Validate Format**: Check CSV structure and ticker validity
+4. **Create Config**: Generate internal configuration
+5. **Process Data**: Download and save ticker data
+
+### JSON Configuration Flow
+1. **Load Config**: Parse JSON configuration file
+2. **Validate Sources**: Check file existence and column names
+3. **Apply Filters**: Filter rows based on specified criteria
+4. **Extract Tickers**: Get ticker symbols from specified columns
+5. **Process Data**: Download and save ticker data
+
+### Common Processing Steps
 1. **Load CSV**: Read and validate CSV structure
 2. **Extract Tickers**: Get ticker symbols from specified column
 3. **Clean & Validate**: Remove invalid tickers, standardize format
@@ -79,7 +163,36 @@ Each ticker generates a CSV file with:
 - **Adj Close**: Adjusted closing price
 - **Volume**: Trading volume
 
-## Use Case Combinations
+## Advanced Features
+
+### Data Filtering
+Filter CSV rows before processing:
+```json
+{
+  "filter_column": "Market Cap",
+  "filter_values": ["Large Cap", "Mid Cap"]
+}
+```
+
+### Custom Output Directories
+Organize output by data source:
+```json
+{
+  "output_dir": "output/my_custom_directory"
+}
+```
+
+### Selective Processing
+Process only specific sources:
+```bash
+# Process only ETFs
+.venv/bin/python main.py --sources etf_list
+
+# Process multiple specific sources
+.venv/bin/python main.py --sources etf_list,iwb_holdings
+```
+
+## Use Case Examples
 
 ### Portfolio Construction
 - **Core Holdings**: Use ETFs for broad market exposure
@@ -90,3 +203,67 @@ Each ticker generates a CSV file with:
 - **Market Analysis**: Compare individual stocks vs sector ETFs
 - **Performance Attribution**: Analyze individual stock contributions
 - **Risk Management**: Use ETFs for diversification, stocks for alpha generation
+
+### Custom Strategies
+- **Sector Rotation**: Download sector ETFs and individual sector stocks
+- **International Exposure**: Mix US stocks with international ETFs
+- **Alternative Assets**: Include commodity and REIT ETFs
+
+## Supported Data Sources Examples
+
+### Stock Indices
+- **S&P 500**: Large-cap US stocks
+- **NASDAQ 100**: Technology-focused stocks
+- **Russell 1000**: Broad large-cap coverage
+- **Russell 2000**: Small-cap stocks
+- **Dow Jones**: Blue-chip stocks
+
+### ETF Categories
+- **Broad Market**: VTI, VOO, SPY, IVV
+- **International**: VEA, VWO, IEFA, EEM
+- **Sector**: XLK, XLF, XLE, XLV, XLI
+- **Bond**: BND, AGG, TLT, HYG
+- **Commodity**: GLD, SLV, USO, DBA
+- **Real Estate**: VNQ, IYR, XLRE
+
+### Custom Lists
+- **Dividend Aristocrats**: High-quality dividend stocks
+- **Growth Stocks**: High-growth companies
+- **Value Stocks**: Undervalued companies
+- **ESG Funds**: Sustainable investing options
+- **Thematic ETFs**: AI, clean energy, genomics
+
+## Migration from Original System
+
+### Backward Compatibility
+The original two data sources still work exactly as before:
+```bash
+# Use legacy mode for original behavior
+.venv/bin/python main.py --legacy
+```
+
+### Upgrade Benefits
+- **Unlimited Sources**: Add any CSV files with ticker symbols
+- **Auto-Discovery**: No configuration needed for simple cases
+- **Flexible Output**: Organize data however you want
+- **Advanced Filtering**: Process subsets of data
+- **Better Organization**: Separate directories per data source
+
+## Troubleshooting Data Sources
+
+### Common Issues
+1. **Column not found**: Ensure ticker column has recognizable name
+2. **Invalid tickers**: System automatically filters invalid symbols
+3. **Empty files**: Check CSV format and content
+4. **Permission errors**: Ensure read access to CSV files
+
+### Debug Commands
+```bash
+# Test auto-discovery
+.venv/bin/python -c "from src.config import ConfigLoader; ConfigLoader.auto_discover_csv_files('data')"
+
+# Check specific file
+.venv/bin/python -c "import pandas as pd; print(pd.read_csv('data/your_file.csv').columns.tolist())"
+```
+
+The system is now **completely generalized** and can handle any CSV files with ticker symbols - the original two sources are just examples of what's possible!
