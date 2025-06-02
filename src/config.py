@@ -33,30 +33,26 @@ class DataSourceConfig:
 
 @dataclass
 class DownloadConfig:
-    """Main configuration for the downloader."""
-    # Date range
+    """Configuration for the stock data downloader."""
     start_date: str = "2000-01-01"
     end_date: Optional[str] = None
-    
-    # Processing configuration
     processing_mode: ProcessingMode = ProcessingMode.ALL
-    specific_sources: List[str] = field(default_factory=list)  # Used with SPECIFIC mode
-    
-    # Performance settings
+    specific_sources: List[str] = field(default_factory=list)
     chunk_size: int = 25
     sleep_between_chunks: int = 5
     individual_sleep: int = 2
     max_retries: int = 3
     initial_backoff: int = 2
-    
-    # Data validation
     min_data_points: int = 10
-    
-    # Logging
     log_file: str = "stock_download.log"
-    
-    # Data sources - can be loaded from config file or set programmatically
     data_sources: Dict[str, DataSourceConfig] = field(default_factory=dict)
+    
+    # New stock-specific settings
+    stock_chunk_size: int = 5  # Smaller chunks for individual stocks
+    etf_chunk_size: int = 25   # Larger chunks for ETFs
+    early_fallback_threshold: int = 3  # Switch to individual after N consecutive chunk failures
+    stock_individual_sleep: int = 3  # Longer sleep for individual stocks
+    etf_individual_sleep: int = 2   # Shorter sleep for ETFs
 
 
 class ConfigLoader:

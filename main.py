@@ -93,6 +93,12 @@ Examples:
     parser.add_argument("--sleep", type=int, default=5,
                        help="Seconds between chunks (default: 5)")
     
+    parser.add_argument(
+        "--stock-optimized",
+        action="store_true",
+        help="Use optimized settings for individual stock downloads (smaller chunks, longer delays)"
+    )
+    
     args = parser.parse_args()
     
     # Handle special commands
@@ -143,6 +149,18 @@ Examples:
     
     if args.sleep:
         config.sleep_between_chunks = args.sleep
+    
+    # Apply stock-optimized settings if requested
+    if args.stock_optimized:
+        config.stock_chunk_size = 3  # Very small chunks for stocks
+        config.etf_chunk_size = 15   # Moderate chunks for ETFs  
+        config.early_fallback_threshold = 2  # Switch to individual faster
+        config.stock_individual_sleep = 4  # Longer delays for stocks
+        config.sleep_between_chunks = max(config.sleep_between_chunks, 8)  # Longer chunk delays
+        print("🎯 Using stock-optimized settings:")
+        print(f"   Stock chunks: {config.stock_chunk_size}, ETF chunks: {config.etf_chunk_size}")
+        print(f"   Early fallback after: {config.early_fallback_threshold} failures")
+        print(f"   Stock sleep: {config.stock_individual_sleep}s, Chunk sleep: {config.sleep_between_chunks}s")
     
     # Validate configuration
     if not config.data_sources:

@@ -54,6 +54,7 @@ Thumbs.db
 multi_source_download.log
 stock_data/
 etf_data/
+output/
 
 # Test outputs and logs (keep test structure but ignore generated content)
 tests/test_outputs/

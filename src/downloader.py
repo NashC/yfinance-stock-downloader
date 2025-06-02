@@ -6,6 +6,7 @@ import os
 import time
 import logging
 import sys
+import signal
 from pathlib import Path
 from typing import List, Optional, Set, Tuple, Dict, Any
 
@@ -24,10 +25,20 @@ class StockDataDownloader:
         self.config = config
         self.logger = self._setup_logging()
         self.data_sources = config.data_sources
+        self.interrupted = False
+        
+        # Setup signal handlers for graceful interruption
+        signal.signal(signal.SIGINT, self._signal_handler)
+        signal.signal(signal.SIGTERM, self._signal_handler)
         
         # Validate configuration
         if not self.data_sources:
             raise ValueError("No data sources configured. Use ConfigLoader to set up data sources.")
+    
+    def _signal_handler(self, signum, frame):
+        """Handle interruption signals gracefully."""
+        self.logger.warning("⚠️  Download interrupted by user")
+        self.interrupted = True
     
     def _setup_logging(self) -> logging.Logger:
         """Configure enhanced logging with both file and console output."""
@@ -165,7 +176,7 @@ class StockDataDownloader:
             self.logger.error(f"Error saving {ticker}: {e}")
             return False
     
-    def download_individual_ticker(self, ticker: str, output_dir: Path) -> bool:
+    def download_individual_ticker(self, ticker: str, output_dir: Path, source_name: str = "") -> bool:
         """Download data for a single ticker with retry logic."""
         attempt = 0
         backoff = self.config.initial_backoff
@@ -186,7 +197,9 @@ class StockDataDownloader:
                 if not data.empty:
                     success = self.save_ticker_data(data, ticker, output_dir)
                     if success:
-                        time.sleep(self.config.individual_sleep)
+                        # Use adaptive sleep time based on source type
+                        sleep_time = self.get_adaptive_sleep_time(source_name)
+                        time.sleep(sleep_time)
                         return True
                 
                 self.logger.warning(f"Empty data returned for {ticker}")
@@ -269,6 +282,29 @@ class StockDataDownloader:
         
         return 0, chunk
     
+    def get_adaptive_chunk_size(self, source_name: str, total_tickers: int) -> int:
+        """Determine optimal chunk size based on data source type and size."""
+        # Use smaller chunks for individual stocks (they seem more sensitive)
+        if 'stock' in source_name.lower() or 'holdings' in source_name.lower():
+            adaptive_size = self.config.stock_chunk_size
+            self.logger.info(f"Using stock-optimized chunk size {adaptive_size} for {source_name}")
+            return adaptive_size
+        elif 'etf' in source_name.lower():
+            adaptive_size = self.config.etf_chunk_size
+            self.logger.info(f"Using ETF-optimized chunk size {adaptive_size} for {source_name}")
+            return adaptive_size
+        else:
+            return self.config.chunk_size
+    
+    def get_adaptive_sleep_time(self, source_name: str) -> int:
+        """Get appropriate sleep time based on data source type."""
+        if 'stock' in source_name.lower() or 'holdings' in source_name.lower():
+            return self.config.stock_individual_sleep
+        elif 'etf' in source_name.lower():
+            return self.config.etf_individual_sleep
+        else:
+            return self.config.individual_sleep
+    
     def process_data_source(self, source_name: str, source_config: DataSourceConfig) -> Dict[str, Any]:
         """Process a single data source and return summary statistics."""
         self.logger.info("=" * 80)
@@ -315,16 +351,23 @@ class StockDataDownloader:
             }
         
         # Process in chunks
-        chunks = [to_download[i:i + self.config.chunk_size] for i in range(0, len(to_download), self.config.chunk_size)]
+        adaptive_chunk_size = self.get_adaptive_chunk_size(source_name, len(to_download))
+        chunks = [to_download[i:i + adaptive_chunk_size] for i in range(0, len(to_download), adaptive_chunk_size)]
         total_chunks = len(chunks)
         total_success = 0
         all_failed_tickers = []
+        consecutive_chunk_failures = 0
         
-        self.logger.info(f"Processing {total_chunks} chunks...")
+        self.logger.info(f"Processing {total_chunks} chunks with adaptive size {adaptive_chunk_size}...")
         
         # Progress bar for chunks
         with tqdm(total=len(to_download), desc=f"Downloading {description}", unit="ticker") as pbar:
             for idx, chunk in enumerate(chunks, 1):
+                # Check for interruption
+                if self.interrupted:
+                    self.logger.info("🛑 Download interrupted - saving progress and exiting gracefully")
+                    break
+                    
                 self.logger.info(f"=== Chunk {idx}/{total_chunks}: {len(chunk)} tickers ===")
                 
                 success_count, failed_tickers = self.download_chunk(chunk, output_dir)
@@ -333,19 +376,53 @@ class StockDataDownloader:
                 all_failed_tickers.extend(failed_tickers)
                 pbar.update(success_count)
                 
+                # Track consecutive failures for early individual fallback
+                if success_count == 0:
+                    consecutive_chunk_failures += 1
+                else:
+                    consecutive_chunk_failures = 0
+                
+                # Early fallback to individual downloads if chunks consistently fail
+                if consecutive_chunk_failures >= self.config.early_fallback_threshold and idx < total_chunks:
+                    remaining_chunks = chunks[idx:]
+                    remaining_tickers = [ticker for chunk in remaining_chunks for ticker in chunk]
+                    self.logger.warning(f"⚠️  {consecutive_chunk_failures} consecutive chunk failures detected")
+                    self.logger.info(f"🔄 Switching to individual downloads for remaining {len(remaining_tickers)} tickers")
+                    
+                    # Process remaining tickers individually
+                    individual_success = 0
+                    with tqdm(total=len(remaining_tickers), desc="Individual fallback", unit="ticker") as individual_pbar:
+                        for ticker in remaining_tickers:
+                            # Check for interruption in individual downloads too
+                            if self.interrupted:
+                                self.logger.info("🛑 Individual download interrupted - saving progress")
+                                break
+                            if self.download_individual_ticker(ticker, output_dir, source_name):
+                                individual_success += 1
+                                total_success += 1
+                            individual_pbar.update(1)
+                            pbar.update(1)
+                    
+                    self.logger.info(f"Individual fallback results: {individual_success}/{len(remaining_tickers)} successful")
+                    break
+                
                 # Sleep between chunks (except for the last one)
-                if idx < total_chunks:
+                if idx < total_chunks and not self.interrupted:
                     self.logger.info(f"Sleeping {self.config.sleep_between_chunks}s before next chunk...")
                     time.sleep(self.config.sleep_between_chunks)
         
-        # Retry failed tickers individually
+        # Retry failed tickers individually (only if not interrupted and we haven't already done individual fallback)
         individual_success = 0
-        if all_failed_tickers:
+        if all_failed_tickers and not self.interrupted and consecutive_chunk_failures < self.config.early_fallback_threshold:
             self.logger.info(f"\n=== Retrying {len(all_failed_tickers)} failed tickers individually ===")
             
             with tqdm(total=len(all_failed_tickers), desc="Individual retry", unit="ticker") as pbar:
                 for ticker in all_failed_tickers:
-                    if self.download_individual_ticker(ticker, output_dir):
+                    # Check for interruption
+                    if self.interrupted:
+                        self.logger.info("🛑 Individual retry interrupted - saving progress")
+                        break
+                    if self.download_individual_ticker(ticker, output_dir, source_name):
                         individual_success += 1
                     pbar.update(1)
             

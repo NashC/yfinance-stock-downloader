@@ -1,0 +1,72 @@
+2025-06-02 16:02:23,109 | INFO | Starting crypto data transformation...
+2025-06-02 16:02:23,109 | INFO | Input directory: output/20250405_crypto_data
+2025-06-02 16:02:23,110 | INFO | Output directory: output/transformed_crypto_data
+2025-06-02 16:02:23,110 | INFO | Download date: 2025-04-05
+2025-06-02 16:02:23,110 | INFO | Sample mode: True
+2025-06-02 16:02:23,110 | INFO | Found 34 CSV files to transform
+2025-06-02 16:02:23,110 | INFO | Sample mode: Processing only 5 files
+2025-06-02 16:02:23,134 | INFO | ✓ Transformed historical_price_data_daily_gemini_SUSHIUSD.csv -> SUSHI_gemini.csv (1783 rows)
+2025-06-02 16:02:23,141 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_ALGOUSD.csv -> ALGO_bitstamp.csv (1105 rows)
+2025-06-02 16:02:23,152 | INFO | ✓ Transformed historical_price_data_daily_gemini_YFIUSD.csv -> YFI_gemini.csv (2002 rows)
+2025-06-02 16:02:23,163 | INFO | ✓ Transformed historical_price_data_daily_gemini_MANAUSD.csv -> MANA_gemini.csv (1801 rows)
+2025-06-02 16:02:23,169 | INFO | ✓ Transformed historical_price_data_daily_coinmarketcap_FLRUSD.csv -> FLR_coinmarketcap.csv (815 rows)
+2025-06-02 16:02:23,169 | INFO | 
+============================================================
+2025-06-02 16:02:23,169 | INFO | CRYPTO DATA TRANSFORMATION SUMMARY
+2025-06-02 16:02:23,169 | INFO | ============================================================
+2025-06-02 16:02:23,169 | INFO | Total files processed: 5
+2025-06-02 16:02:23,169 | INFO | Successful transformations: 5
+2025-06-02 16:02:23,169 | INFO | Failed transformations: 0
+2025-06-02 16:02:23,169 | INFO | Success rate: 100.0%
+2025-06-02 16:02:23,169 | INFO | Output directory: output/transformed_crypto_data
+2025-06-02 16:02:23,169 | INFO | Crypto data transformation completed successfully!
+2025-06-02 16:02:39,270 | INFO | Starting crypto data transformation...
+2025-06-02 16:02:39,270 | INFO | Input directory: output/20250405_crypto_data
+2025-06-02 16:02:39,270 | INFO | Output directory: output/transformed_crypto_data
+2025-06-02 16:02:39,270 | INFO | Download date: 2025-04-05
+2025-06-02 16:02:39,270 | INFO | Sample mode: False
+2025-06-02 16:02:39,270 | INFO | Found 34 CSV files to transform
+2025-06-02 16:02:39,292 | INFO | ✓ Transformed historical_price_data_daily_gemini_SUSHIUSD.csv -> SUSHI_gemini.csv (1783 rows)
+2025-06-02 16:02:39,300 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_ALGOUSD.csv -> ALGO_bitstamp.csv (1105 rows)
+2025-06-02 16:02:39,312 | INFO | ✓ Transformed historical_price_data_daily_gemini_YFIUSD.csv -> YFI_gemini.csv (2002 rows)
+2025-06-02 16:02:39,322 | INFO | ✓ Transformed historical_price_data_daily_gemini_MANAUSD.csv -> MANA_gemini.csv (1801 rows)
+2025-06-02 16:02:39,328 | INFO | ✓ Transformed historical_price_data_daily_coinmarketcap_FLRUSD.csv -> FLR_coinmarketcap.csv (815 rows)
+2025-06-02 16:02:39,338 | INFO | ✓ Transformed historical_price_data_daily_gemini_DAIUSD.csv -> DAI_gemini.csv (1810 rows)
+2025-06-02 16:02:39,358 | INFO | ✓ Transformed historical_price_data_daily_gemini_BTCUSD.csv -> BTC_gemini.csv (3812 rows)
+2025-06-02 16:02:39,365 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_ADAUSD.csv -> ADA_bitstamp.csv (1105 rows)
+2025-06-02 16:02:39,373 | INFO | ✓ Transformed historical_price_data_daily_bitfinex_XTZUSD.csv -> XTZ_bitfinex.csv (1214 rows)
+2025-06-02 16:02:39,382 | INFO | ✓ Transformed historical_price_data_daily_gemini_MATICUSD.csv -> MATIC_gemini.csv (1784 rows)
+2025-06-02 16:02:39,397 | INFO | ✓ Transformed historical_price_data_daily_bitfinex_ETCUSD.csv -> ETC_bitfinex.csv (3175 rows)
+2025-06-02 16:02:39,404 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_XLMUSD.csv -> XLM_bitstamp.csv (1105 rows)
+2025-06-02 16:02:39,414 | INFO | ✓ Transformed historical_price_data_daily_gemini_UNIUSD.csv -> UNI_gemini.csv (2002 rows)
+2025-06-02 16:02:39,426 | INFO | ✓ Transformed historical_price_data_daily_gemini_MKRUSD.csv -> MKR_gemini.csv (1996 rows)
+2025-06-02 16:02:39,437 | INFO | ✓ Transformed historical_price_data_daily_binance_ATOMUSDT.csv -> ATOM_binance.csv (2168 rows)
+2025-06-02 16:02:39,449 | INFO | ✓ Transformed historical_price_data_daily_gemini_ZRXUSD.csv -> ZRX_gemini.csv (2001 rows)
+2025-06-02 16:02:39,456 | INFO | ✓ Transformed historical_price_data_daily_bitfinex_DOTUSD.csv -> DOT_bitfinex.csv (1215 rows)
+2025-06-02 16:02:39,467 | INFO | ✓ Transformed historical_price_data_daily_gemini_FILUSD.csv -> FIL_gemini.csv (1978 rows)
+2025-06-02 16:02:39,485 | INFO | ✓ Transformed historical_price_data_daily_gemini_ETHUSD.csv -> ETH_gemini.csv (3600 rows)
+2025-06-02 16:02:39,497 | INFO | ✓ Transformed historical_price_data_daily_gemini_BCHUSD.csv -> BCH_gemini.csv (2280 rows)
+2025-06-02 16:02:39,508 | INFO | ✓ Transformed historical_price_data_daily_gemini_BATUSD.csv -> BAT_gemini.csv (2145 rows)
+2025-06-02 16:02:39,519 | INFO | ✓ Transformed historical_price_data_daily_gemini_COMPUSD.csv -> COMP_gemini.csv (2011 rows)
+2025-06-02 16:02:39,531 | INFO | ✓ Transformed historical_price_data_daily_gemini_LINKUSD.csv -> LINK_gemini.csv (2139 rows)
+2025-06-02 16:02:39,546 | INFO | ✓ Transformed historical_price_data_daily_gemini_ZECUSD.csv -> ZEC_gemini.csv (2857 rows)
+2025-06-02 16:02:39,560 | INFO | ✓ Transformed historical_price_data_daily_bitfinex_EOSUSD.csv -> EOS_bitfinex.csv (2836 rows)
+2025-06-02 16:02:39,570 | INFO | ✓ Transformed historical_price_data_daily_gemini_SNXUSD.csv -> SNX_gemini.csv (1609 rows)
+2025-06-02 16:02:39,579 | INFO | ✓ Transformed historical_price_data_daily_coinlore_CELOUSD.csv -> CELO_coinlore.csv (1677 rows)
+2025-06-02 16:02:39,589 | INFO | ✓ Transformed historical_price_data_daily_bitfinex_REPUSD.csv -> REP_bitfinex.csv (1979 rows)
+2025-06-02 16:02:39,603 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_XRPUSD.csv -> XRP_bitstamp.csv (3001 rows)
+2025-06-02 16:02:39,613 | INFO | ✓ Transformed historical_price_data_daily_gemini_STORJUSD.csv -> STORJ_gemini.csv (1809 rows)
+2025-06-02 16:02:39,627 | INFO | ✓ Transformed historical_price_data_daily_gemini_LTCUSD.csv -> LTC_gemini.csv (2710 rows)
+2025-06-02 16:02:39,635 | INFO | ✓ Transformed historical_price_data_daily_bitstamp_AVAXUSD.csv -> AVAX_bitstamp.csv (1105 rows)
+2025-06-02 16:02:39,645 | INFO | ✓ Transformed historical_price_data_daily_gemini_AAVEUSD.csv -> AAVE_gemini.csv (1809 rows)
+2025-06-02 16:02:39,655 | INFO | ✓ Transformed historical_price_data_daily_gemini_SOLUSD.csv -> SOL_gemini.csv (1592 rows)
+2025-06-02 16:02:39,655 | INFO | 
+============================================================
+2025-06-02 16:02:39,655 | INFO | CRYPTO DATA TRANSFORMATION SUMMARY
+2025-06-02 16:02:39,655 | INFO | ============================================================
+2025-06-02 16:02:39,655 | INFO | Total files processed: 34
+2025-06-02 16:02:39,655 | INFO | Successful transformations: 34
+2025-06-02 16:02:39,655 | INFO | Failed transformations: 0
+2025-06-02 16:02:39,655 | INFO | Success rate: 100.0%
+2025-06-02 16:02:39,655 | INFO | Output directory: output/transformed_crypto_data
+2025-06-02 16:02:39,655 | INFO | Crypto data transformation completed successfully!
