@@ -1,0 +1,83 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Enhanced Multi-Source Stock Price Data Downloader
+
+## Project Overview
+This project downloads historical stock price data from Yahoo Finance supporting multiple data sources:
+- **Individual Stocks**: IWB Russell 1000 holdings (1,021 large-cap US stocks)
+- **ETFs**: Comprehensive ETF universe (250+ ETFs across asset classes)
+- **Combined Processing**: Download both datasets simultaneously
+
+## Modern Python Setup
+This project uses modern Python packaging standards:
+- **Package Manager**: [uv](mdc:https:/github.com/astral-sh/uv) for fast dependency management
+- **Configuration**: `pyproject.toml` following PEP 518/621 standards
+- **Command-line Tool**: `download-stock-data` entry point
+- **Development Tools**: Black, isort, mypy, pytest, ruff for code quality
+
+## Key Files Structure
+
+### Main Script & Package
+- [download_stock_price_data.py](mdc:download_stock_price_data.py) - Enhanced multi-source downloader with robust error handling, progress tracking, and data validation
+- [pyproject.toml](mdc:pyproject.toml) - Modern Python packaging configuration with dependencies, dev tools, and entry points
+
+### Data Sources
+- [IWB_holdings_250529.csv](mdc:IWB_holdings_250529.csv) - Russell 1000 individual stock holdings with "Ticker" column
+- [etf_list.csv](mdc:etf_list.csv) - ETF universe data with "Symbol" column
+
+### Configuration & Documentation
+- [requirements.txt](mdc:requirements.txt) - Legacy dependency file (maintained for compatibility)
+- [requirements.lock](mdc:requirements.lock) - Pinned dependency versions for reproducible builds
+- [README.md](mdc:README.md) - Comprehensive documentation with modern setup instructions
+- [.gitignore](mdc:.gitignore) - Comprehensive ignore patterns including build artifacts
+
+### Output Structure
+- `stock_data/` - Individual stock CSV files (MSFT.csv, AAPL.csv, etc.)
+- `etf_data/` - ETF CSV files (VOO.csv, SPY.csv, etc.)
+- `multi_source_download.log` - Execution logs with detailed progress tracking
+
+## Installation & Usage
+
+### Quick Setup
+```bash
+# Create and activate environment
+uv venv
+source .venv/bin/activate
+
+# Install project with dependencies
+uv pip install -e .
+
+# Run the tool
+download-stock-data
+```
+
+### Alternative Methods
+```bash
+# Install dependencies only
+uv pip install -r requirements.txt
+
+# Use lock file for exact reproducibility
+uv pip sync requirements.lock
+
+# Install with development tools
+uv pip install -e ".[dev]"
+```
+
+## Key Features
+- **Multi-source processing** with configurable modes (stocks, etfs, both, auto)
+- **Robust error handling** with exponential backoff and individual ticker fallback
+- **Progress tracking** with real-time progress bars per data source
+- **Resume capability** - skips already downloaded files
+- **Data validation** - validates ticker symbols and data quality
+- **Separate output directories** for organized data storage
+- **Command-line interface** - easy to use and distribute
+
+## Processing Modes
+Configure via `PROCESSING_MODE` variable:
+- `"both"` - Process both stocks and ETFs (default)
+- `"stocks"` - Process only individual stocks
+- `"etfs"` - Process only ETFs
+- `"auto"` - Auto-detect available sources

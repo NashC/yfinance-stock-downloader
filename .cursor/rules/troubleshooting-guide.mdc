@@ -1,0 +1,211 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Troubleshooting Guide
+
+## Common Issues & Solutions
+
+### Environment Issues
+
+**Problem**: `command not found: python`
+**Solution**: Use `python3` or activate virtual environment
+```bash
+# Modern setup with uv (recommended)
+uv venv
+source .venv/bin/activate
+uv pip install -e .
+
+# Legacy setup
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+**Problem**: Missing dependencies
+**Solution**: Install using modern uv workflow
+```bash
+# Recommended: Install project with all dependencies
+uv pip install -e .
+
+# Alternative: Install from requirements
+uv pip install -r requirements.txt
+
+# For exact reproducibility
+uv pip sync requirements.lock
+
+# Legacy pip method
+pip install pandas yfinance tqdm
+```
+
+**Problem**: `uv` command not found
+**Solution**: Install uv package manager
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Then restart terminal or source shell profile
+```
+
+### CSV Format Issues
+
+**Problem**: `Column 'Ticker' not found` or `Column 'Symbol' not found`
+**Solution**: 
+- Check CSV file exists in project directory
+- Verify column names match configuration in [download_stock_price_data.py](mdc:download_stock_price_data.py)
+- For [IWB_holdings_250529.csv](mdc:IWB_holdings_250529.csv): must have "Ticker" column
+- For [etf_list.csv](mdc:etf_list.csv): must have "Symbol" column
+
+**Problem**: Invalid ticker symbols
+**Solution**: Script automatically validates and skips invalid tickers. Check logs for details.
+
+### Network & API Issues
+
+**Problem**: Download failures or timeouts
+**Solution**: 
+- Check internet connection
+- Script includes automatic retry logic with exponential backoff
+- Some tickers may be delisted or invalid (normal)
+- Increase `SLEEP_BETWEEN_CHUNKS` for rate limiting
+
+**Problem**: Yahoo Finance API errors
+**Solution**:
+- Temporary API issues usually resolve automatically
+- Script retries failed tickers individually
+- Check [multi_source_download.log](mdc:multi_source_download.log) for specific errors
+
+### Performance Issues
+
+**Problem**: Downloads too slow
+**Solution**: Adjust performance settings in [download_stock_price_data.py](mdc:download_stock_price_data.py):
+- Increase `CHUNK_SIZE` (but may cause more failures)
+- Decrease `SLEEP_BETWEEN_CHUNKS` (but respect rate limits)
+
+**Problem**: Too many failures
+**Solution**:
+- Decrease `CHUNK_SIZE` for better reliability
+- Increase `SLEEP_BETWEEN_CHUNKS` for rate limiting
+- Check network stability
+
+### Command-Line Issues
+
+**Problem**: `download-stock-data` command not found
+**Solution**: 
+- Ensure project is installed: `uv pip install -e .`
+- Activate virtual environment: `source .venv/bin/activate`
+- Alternative: Run directly with `python download_stock_price_data.py`
+
+**Problem**: Import errors when running script
+**Solution**:
+- Reinstall project: `uv pip install -e .`
+- Check virtual environment is activated
+- Verify all dependencies installed: `uv pip list`
+
+## Log Analysis
+
+### Log File Location
+Check `multi_source_download.log` for detailed execution information.
+
+### Key Log Patterns
+
+**Successful Processing**:
+```
+INFO | ✓ Saved MSFT: 6234 data points to MSFT.csv
+INFO | ✓ Chunk completed: 25 successful, 0 failed
+```
+
+**Failed Downloads**:
+```
+WARNING | Empty data returned for INVALID_TICKER
+ERROR | ✗ Failed to download TICKER after 3 attempts: [error details]
+```
+
+**Progress Tracking**:
+```
+INFO | === Chunk 1/41: 25 tickers ===
+INFO | Processing 41 chunks...
+```
+
+**Final Summary**:
+```
+INFO | COMPREHENSIVE DOWNLOAD SUMMARY
+INFO | Total successful downloads: 1266
+INFO | Overall success rate: 99.6%
+```
+
+## Data Validation Issues
+
+**Problem**: Empty or insufficient data
+**Solution**: 
+- Script validates minimum data points (`MIN_DATA_POINTS = 10`)
+- Some tickers may have limited historical data
+- Check ticker validity on Yahoo Finance manually
+
+**Problem**: Missing OHLCV columns
+**Solution**: 
+- Script validates required columns automatically
+- Some tickers may not have complete data
+- Failed validations are logged and skipped
+
+## Resume Capability
+
+**Feature**: Script automatically skips already downloaded files
+**Location**: Checks existing files in output directories:
+- `stock_data/` for individual stocks
+- `etf_data/` for ETFs
+
+**To Force Re-download**: Delete specific ticker CSV files or entire output directories
+
+## Configuration Debugging
+
+### Check Data Source Configuration
+Verify in [download_stock_price_data.py](mdc:download_stock_price_data.py):
+```python
+DATA_SOURCES = {
+    "iwb_holdings": {
+        "file": "IWB_holdings_250529.csv",  # File exists?
+        "ticker_column": "Ticker",          # Column exists?
+        "enabled": True                     # Source enabled?
+    }
+}
+```
+
+### Processing Mode Issues
+- `PROCESSING_MODE = "both"` - Processes all enabled sources
+- `PROCESSING_MODE = "stocks"` - Only IWB holdings
+- `PROCESSING_MODE = "etfs"` - Only ETF list
+- `PROCESSING_MODE = "auto"` - Auto-detect available files
+
+## Permission Issues
+
+**Problem**: Cannot create output directories or files
+**Solution**:
+- Check write permissions in project directory
+- Ensure sufficient disk space
+- Run with appropriate user permissions
+
+## Development Environment Issues
+
+**Problem**: Linting or formatting errors
+**Solution**: Install development dependencies and run tools
+```bash
+# Install dev dependencies
+uv pip install -e ".[dev]"
+
+# Format code
+black .
+isort .
+
+# Type checking
+mypy download_stock_price_data.py
+
+# Linting
+ruff check .
+```
+
+## Getting Help
+
+1. Check [README.md](mdc:README.md) for comprehensive documentation
+2. Review `multi_source_download.log` for detailed error information
+3. Verify configuration settings match your data sources
+4. Test with smaller datasets first (disable one source or reduce date range)
+5. Check [pyproject.toml](mdc:pyproject.toml) for project configuration and dependencies

@@ -1,0 +1,92 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Data Sources Guide
+
+## Available Data Sources
+
+### Individual Stocks - IWB Holdings
+**File**: [IWB_holdings_250529.csv](mdc:IWB_holdings_250529.csv)
+**Ticker Column**: `Ticker`
+**Count**: 1,021 Russell 1000 stocks
+**Output Directory**: `stock_data/`
+
+**Best for**:
+- Individual stock analysis and research
+- Building custom portfolios of specific companies
+- Sector analysis within large-cap US stocks
+- Fundamental analysis and stock picking
+- Direct company exposure
+
+**Coverage**: Russell 1000 stocks (~93% of US market cap)
+
+**Sample Format**:
+```csv
+Ticker,Name,Sector,Asset Class,Market Value,Weight (%)
+MSFT,MICROSOFT CORP,Information Technology,Equity,...
+NVDA,NVIDIA CORP,Information Technology,Equity,...
+AAPL,APPLE INC,Information Technology,Equity,...
+```
+
+### ETF Universe
+**File**: [etf_list.csv](mdc:etf_list.csv)
+**Ticker Column**: `Symbol`
+**Count**: 250+ ETFs
+**Output Directory**: `etf_data/`
+
+**Best for**:
+- Diversified portfolio construction
+- Asset allocation strategies
+- Sector and thematic investing
+- International market exposure
+- Alternative asset classes (bonds, commodities, REITs)
+
+**Coverage**: 250+ ETFs across:
+- **Equity ETFs**: US (large/mid/small cap), International, Emerging Markets
+- **Bond ETFs**: Government, Corporate, Municipal, International
+- **Sector ETFs**: Technology, Healthcare, Energy, Financials
+- **Commodity ETFs**: Gold, Silver, Oil
+- **Cryptocurrency ETFs**: Bitcoin
+- **Real Estate ETFs**: REITs
+
+**Sample Format**:
+```csv
+Symbol,ETF Name,Asset Class,Total Assets ($MM),YTD Price Change
+VOO,Vanguard S&P 500 ETF,Equity,"$654,371",0.90%
+SPY,SPDR S&P 500 ETF Trust,Equity,"$601,099",0.87%
+IVV,iShares Core S&P 500 ETF,Equity,"$580,170",0.90%
+```
+
+## Data Processing Flow
+
+1. **Load CSV**: Read and validate CSV structure
+2. **Extract Tickers**: Get ticker symbols from specified column
+3. **Clean & Validate**: Remove invalid tickers, standardize format
+4. **Check Existing**: Skip already downloaded files
+5. **Download in Chunks**: Process tickers in configurable batches
+6. **Individual Retry**: Retry failed tickers individually
+7. **Save Data**: Store OHLCV data as individual CSV files
+
+## Output Data Format
+Each ticker generates a CSV file with:
+- **Date** (index): Trading date
+- **Open**: Opening price
+- **High**: Highest price
+- **Low**: Lowest price
+- **Close**: Closing price
+- **Adj Close**: Adjusted closing price
+- **Volume**: Trading volume
+
+## Use Case Combinations
+
+### Portfolio Construction
+- **Core Holdings**: Use ETFs for broad market exposure
+- **Satellite Holdings**: Use individual stocks for specific opportunities
+- **Asset Allocation**: Combine equity ETFs, bond ETFs, and individual stocks
+
+### Research & Analysis
+- **Market Analysis**: Compare individual stocks vs sector ETFs
+- **Performance Attribution**: Analyze individual stock contributions
+- **Risk Management**: Use ETFs for diversification, stocks for alpha generation
