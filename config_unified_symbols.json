@@ -1,0 +1,23 @@
+{
+  "start_date": "2000-01-01",
+  "end_date": null,
+  "processing_mode": "specific",
+  "specific_sources": [
+    "unified_symbols"
+  ],
+  "log_file": "unified_symbols_download.log",
+  "chunk_size": 15,
+  "sleep_between_chunks": 2,
+  "individual_sleep": 1,
+  "memory_threshold": 0.8,
+  "max_parallel_workers": 4,
+  "data_sources": {
+    "unified_symbols": {
+      "file": "data/symbol_lists/unified_symbols.csv",
+      "ticker_column": "Symbol",
+      "description": "Unified Symbol List (Large Dataset)",
+      "output_dir": "output/unified_symbols_data",
+      "enabled": true
+    }
+  }
+}

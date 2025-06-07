@@ -1,5 +1,6 @@
 """
 Configuration classes and enums for the generalized stock data downloader.
+Optimized for PostgreSQL database uploads and large-scale processing.
 """
 
 import json
@@ -33,26 +34,45 @@ class DataSourceConfig:
 
 @dataclass
 class DownloadConfig:
-    """Configuration for the stock data downloader."""
+    """Configuration for the stock data downloader with PostgreSQL optimizations."""
     start_date: str = "2000-01-01"
     end_date: Optional[str] = None
     processing_mode: ProcessingMode = ProcessingMode.ALL
     specific_sources: List[str] = field(default_factory=list)
-    chunk_size: int = 25
-    sleep_between_chunks: int = 5
-    individual_sleep: int = 2
+    
+    # Performance settings optimized for large datasets
+    chunk_size: int = 10  # Smaller chunks for better memory management
+    sleep_between_chunks: int = 3  # Conservative rate limiting
+    individual_sleep: int = 1  # Faster individual downloads
     max_retries: int = 3
     initial_backoff: int = 2
     min_data_points: int = 10
     log_file: str = "stock_download.log"
     data_sources: Dict[str, DataSourceConfig] = field(default_factory=dict)
     
-    # New stock-specific settings
-    stock_chunk_size: int = 5  # Smaller chunks for individual stocks
-    etf_chunk_size: int = 25   # Larger chunks for ETFs
+    # Memory management settings
+    memory_threshold: float = 0.85  # 85% memory usage threshold
+    batch_size: int = 1000  # Batch size for ticker processing
+    force_gc_interval: int = 100  # Force garbage collection every N tickers
+    
+    # PostgreSQL-specific settings
+    postgres_batch_size: int = 500  # Optimal batch size for PostgreSQL COPY
+    postgres_date_format: str = "%Y-%m-%d"  # PostgreSQL DATE format
+    postgres_float_precision: int = 6  # Decimal precision for floats
+    postgres_null_value: str = "NULL"  # NULL representation
+    
+    # Large dataset optimizations
+    large_dataset_threshold: int = 10000  # Threshold for large dataset optimizations
+    adaptive_chunk_sizing: bool = True  # Enable adaptive chunk sizing
+    parallel_downloads: bool = True  # Enable parallel downloads for chunks
+    max_parallel_workers: int = 3  # Maximum parallel workers
+    
+    # Resume and progress tracking
+    enable_resume: bool = True  # Skip already downloaded files
+    progress_checkpoint_interval: int = 100  # Log progress every N tickers
+    
+    # Early fallback settings for failed chunks
     early_fallback_threshold: int = 3  # Switch to individual after N consecutive chunk failures
-    stock_individual_sleep: int = 3  # Longer sleep for individual stocks
-    etf_individual_sleep: int = 2   # Shorter sleep for ETFs
 
 
 class ConfigLoader:
@@ -86,14 +106,14 @@ class ConfigLoader:
     
     @staticmethod
     def auto_discover_csv_files(data_dir: str = "data", output_base_dir: str = "output") -> DownloadConfig:
-        """Auto-discover CSV files in a directory and create configuration."""
+        """Auto-discover CSV files in a directory and create configuration with optimizations."""
         data_path = Path(data_dir)
         if not data_path.exists():
             raise FileNotFoundError(f"Data directory not found: {data_dir}")
         
         data_sources = {}
         
-        for csv_file in data_path.glob("*.csv"):
+        for csv_file in data_path.glob("**/*.csv"):  # Recursive search
             # Try to auto-detect ticker column
             import pandas as pd
             try:
@@ -132,49 +152,101 @@ class ConfigLoader:
         if not data_sources:
             raise ValueError(f"No valid CSV files with ticker columns found in {data_dir}")
         
-        return DownloadConfig(
+        # Optimize configuration based on discovered sources
+        config = DownloadConfig(
             data_sources=data_sources,
             processing_mode=ProcessingMode.ALL
         )
+        
+        # Apply optimizations for large datasets
+        total_estimated_tickers = 0
+        for source_name, source_config in data_sources.items():
+            try:
+                # Quick estimate of ticker count
+                df_sample = pd.read_csv(source_config.file, nrows=100)
+                if source_config.ticker_column in df_sample.columns:
+                    # Rough estimate based on sample
+                    file_size = Path(source_config.file).stat().st_size
+                    sample_size = len(df_sample)
+                    estimated_total = int((file_size / 1024) * sample_size / 10)  # Rough estimate
+                    total_estimated_tickers += estimated_total
+            except:
+                pass
+        
+        # Apply large dataset optimizations
+        if total_estimated_tickers > config.large_dataset_threshold:
+            print(f"🔧 Large dataset detected (~{total_estimated_tickers:,} tickers). Applying optimizations...")
+            config.chunk_size = max(5, config.chunk_size // 2)  # Smaller chunks
+            config.sleep_between_chunks = max(2, config.sleep_between_chunks)  # Conservative timing
+            config.memory_threshold = 0.80  # Lower memory threshold
+            config.force_gc_interval = 50  # More frequent garbage collection
+            print(f"   - Chunk size: {config.chunk_size}")
+            print(f"   - Sleep between chunks: {config.sleep_between_chunks}s")
+            print(f"   - Memory threshold: {config.memory_threshold*100:.0f}%")
+        
+        return config
     
     @staticmethod
     def create_sample_config_file(filename: str = "config.json") -> None:
-        """Create a sample configuration file."""
+        """Create a sample configuration file with PostgreSQL optimizations."""
         sample_config = {
             "start_date": "2000-01-01",
             "end_date": None,
             "processing_mode": "all",
             "specific_sources": [],
-            "chunk_size": 25,
-            "sleep_between_chunks": 5,
-            "individual_sleep": 2,
+            
+            # Performance settings optimized for large datasets
+            "chunk_size": 10,
+            "sleep_between_chunks": 3,
+            "individual_sleep": 1,
             "max_retries": 3,
             "initial_backoff": 2,
             "min_data_points": 10,
             "log_file": "stock_download.log",
+            
+            # Memory management
+            "memory_threshold": 0.85,
+            "batch_size": 1000,
+            "force_gc_interval": 100,
+            
+            # PostgreSQL-specific settings
+            "postgres_batch_size": 500,
+            "postgres_date_format": "%Y-%m-%d",
+            "postgres_float_precision": 6,
+            "postgres_null_value": "NULL",
+            
+            # Large dataset optimizations
+            "large_dataset_threshold": 10000,
+            "adaptive_chunk_sizing": True,
+            "parallel_downloads": True,
+            "max_parallel_workers": 3,
+            
+            # Resume and progress tracking
+            "enable_resume": True,
+            "progress_checkpoint_interval": 100,
+            "early_fallback_threshold": 3,
+            
             "data_sources": {
+                "unified_symbols": {
+                    "file": "data/symbol_lists/unified_symbols.csv",
+                    "ticker_column": "Symbol",
+                    "description": "Unified Symbol List (Large Dataset)",
+                    "output_dir": "output/unified_symbols_data",
+                    "enabled": True
+                },
                 "sp500": {
                     "file": "data/sp500_tickers.csv",
                     "ticker_column": "Symbol",
                     "description": "S&P 500 Companies",
                     "output_dir": "output/sp500_data",
-                    "enabled": True
-                },
-                "nasdaq100": {
-                    "file": "data/nasdaq100.csv",
-                    "ticker_column": "Ticker",
-                    "description": "NASDAQ 100 Companies",
-                    "output_dir": "output/nasdaq100_data",
-                    "enabled": True,
-                    "filter_column": "Market Cap",
-                    "filter_values": ["Large Cap"]
+                    "enabled": False
                 },
                 "etfs": {
                     "file": "data/etf_list.csv",
                     "ticker_column": "Symbol",
                     "description": "ETF Universe",
                     "output_dir": "output/etf_data",
-                    "enabled": True
+                    "enabled": False
                 }
             }
         }
@@ -182,8 +254,9 @@ class ConfigLoader:
         with open(filename, 'w') as f:
             json.dump(sample_config, f, indent=2)
         
-        print(f"✓ Sample configuration created: {filename}")
+        print(f"✓ PostgreSQL-optimized configuration created: {filename}")
         print("Edit this file to customize your data sources and settings.")
+        print("Configuration is optimized for large datasets and PostgreSQL uploads.")
 
 
 # Legacy compatibility - create default config similar to original
@@ -210,5 +283,9 @@ def create_legacy_config() -> DownloadConfig:
     
     return DownloadConfig(
         data_sources=data_sources,
-        processing_mode=ProcessingMode.ALL
+        processing_mode=ProcessingMode.ALL,
+        # Use conservative settings for legacy compatibility
+        chunk_size=5,
+        sleep_between_chunks=5,
+        individual_sleep=3
     ) 
