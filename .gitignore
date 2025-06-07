@@ -56,7 +56,20 @@ stock_data/
 etf_data/
 output/
 
+# All log files
+*.log
+*_download.log
+*_transformation.log
+
+# Data directories with large CSV files
+data/symbol_lists/
+data/raw_symbol_lists/
+
+# Configuration files (uncomment if they contain sensitive data)
+# config_unified_symbols.json
+# config.json
+
 # Test outputs and logs (keep test structure but ignore generated content)
 tests/test_outputs/
 tests/logs/
-tests/analysis/analysis_results.csv 
+tests/analysis/analysis_results.csv
