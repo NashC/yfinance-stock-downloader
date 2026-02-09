@@ -38,6 +38,8 @@ dist/
 # IDE
 .vscode/
 .idea/
+.cursor/
+.cursorignore
 *.swp
 *.swo
 
